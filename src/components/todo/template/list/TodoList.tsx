@@ -22,12 +22,12 @@ const TodoList = ({ toggleTodo, removeTodo, todos }: TodoListProps) => {
       {todos &&
         todos.map((todo) => (
           <TodoItem
-            toggleTodo={toggleTodo}
-            removeTodo={removeTodo}
-            key={todo.id}
-            todo={todo}
+          toggleTodo={toggleTodo}
+          removeTodo={removeTodo}
+          key={todo.id}
+          todo={todo}
           />
-        ))}
+          ))}
     </TodoListBlock>
   );
 };
