@@ -56,5 +56,5 @@ npm start
 
 netlify 를 이용하여 배포
 
-[solar - connect ](https://dazzling-pike-eca1ac.netlify.app/)
+[solar - connect ](https://romantic-jepsen-22bf01.netlify.app/)
 
