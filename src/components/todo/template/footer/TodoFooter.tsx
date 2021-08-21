@@ -17,15 +17,15 @@ const LeftText = styled.div`
 `;
 
 interface HooksTodoHeadProps {
-  todos: Itodo[];
+  todos?: Itodo[];
 }
 
 const Todofooter = ({ todos }: HooksTodoHeadProps) => {
-  const undoneTasks = todos.filter((todo) => !todo.done);
+  const undoneTasks = todos?.filter((todo) => !todo.done);
   return (
     <TodoFooterBlock>
       <LeftText className="tasks-left">
-        {undoneTasks.length} items left
+        {undoneTasks?.length} items left
       </LeftText>
     </TodoFooterBlock>
   );

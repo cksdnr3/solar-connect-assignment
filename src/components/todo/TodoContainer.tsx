@@ -1,36 +1,53 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTodo } from "./TodoService";
 import TodoTemplate from "./template/TodoTemplate";
 import TodoHead from "./template/head/TodoHead";
 import TodoList from "./template/list/TodoList";
 import TodoCreate from "./template/create/TodoCreate";
 import TodoFooter from "./template/footer/TodoFooter";
+import TodoEdit from './template/edit/TodoEdit';
+import { Itodo } from "components/todo/TodoService";
 
 const TodoContainer = () => {
   const {
     todoState,
-    nextIdState,
-    incrementNextId,
     toggleTodo,
     removeTodo,
     createTodo,
+    editTodo,
   } = useTodo();
-  
+
+  const [open, setOpen] = useState<boolean>(false);
+  const [select, setSelecte] = useState<Itodo>(todoState[0]);
+
+  const openEdit = useCallback((todo: Itodo) => {
+    setOpen((prev: boolean) => !prev);
+    setSelecte(todo);
+  }, [select])
+
   return (
     <>
       <TodoTemplate>
         <TodoHead />
-        <TodoCreate
-          nextId={nextIdState}
-          createTodo={createTodo}
-          incrementNextId={incrementNextId}
-        />
-        <TodoList
+        {open 
+        ? <TodoEdit
           toggleTodo={toggleTodo}
-          removeTodo={removeTodo}
-          todos={todoState}
-        />
-        <TodoFooter todos={todoState} />
+          editTodo={editTodo}
+          todo={select}
+          setOpen={setOpen} /> 
+        : <> 
+            <TodoCreate
+            createTodo={createTodo}
+            />
+            <TodoList
+            openEdit={openEdit}
+            toggleTodo={toggleTodo}
+            removeTodo={removeTodo}
+            todos={todoState}
+            />
+            <TodoFooter todos={todoState} />
+          </>
+          }
       </TodoTemplate>
     </>
   );

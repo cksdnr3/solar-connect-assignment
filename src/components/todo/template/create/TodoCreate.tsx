@@ -1,24 +1,31 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { PlusCircleOutlined } from "@ant-design/icons";
+import { DatePicker } from "antd";
 import type { Itodo } from "components/todo/TodoService";
+import moment from "moment";
+import { Modal } from "antd";
+import getErrorMessage from "utils/getErrorMessage";
 
-const CircleButton = styled.button<{ open: boolean }>`
+const modalConfig = (title: string) => {
+  return { title };
+}
+
+const CircleButton = styled.button`
   background: #33bb77;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   align-items: center;
-  justify-content: center;
-  font-size: 60px;
-  left: 50%;
+  justify-content: center;  
+	display: flex;
+  left: 50%; 
+  font-size: 50px;
   transform: translate(50%, 0%);
   color: white;
   border-radius: 50%;
   border: none;
   outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  cursor: pointer;
 `;
 
 const InsertFormPositioner = styled.div`
@@ -27,20 +34,20 @@ const InsertFormPositioner = styled.div`
 `;
 
 const InsertForm = styled.form`
-  display: flex;
+  display: column;
   background: #eeeeee;
   padding-left: 40px;
-  padding-top: 36px;
+  padding-top: 25px;
   padding-right: 60px;
-  padding-bottom: 36px;
+  padding-bottom: 30px;
 `;
 
 const Input = styled.input`
-  padding: 12px;
+  padding: 10px;
   border: 1px solid #dddddd;
   width: 100%;
   outline: none;
-  font-size: 21px;
+  font-size: 18px;
   box-sizing: border-box;
   color: #119955;
   &::placeholder {
@@ -49,52 +56,76 @@ const Input = styled.input`
   }
 `;
 
+const TextInputBlock = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
 interface TodoCreateProps {
-  nextId: number;
   createTodo: (todo: Itodo) => void;
-  incrementNextId: () => void;
 }
 
-const TodoCreate = ({
-  nextId,
-  createTodo,
-  incrementNextId
-}: TodoCreateProps) => {
-  const [open, setOpen] = useState(false);
+const TodoCreate = ({ createTodo }: TodoCreateProps) => {
   const [value, setValue] = useState("");
+  const [deadline, setDeadline] = useState<moment.Moment | null>(null);
+  const [modal, contextHolder] = Modal.useModal();
 
-  const handleToggle = () => setOpen(!open);
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+  const checkValidation = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    const errorMessage = getErrorMessage(value);
+    if (errorMessage) {
+      modal.error(modalConfig(errorMessage));
+      e.preventDefault();
+    }
+  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setValue(e.target.value);
+  }
+  const handleDeadlineChange = (value: moment.Moment | null): void => {
+    setDeadline(value);
+  }
+  const handleDisabledDate = (currentDate: moment.Moment) => currentDate < moment();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault(); // 새로고침 방지
 
     createTodo({
-      id: nextId,
+      id: 0,
       text: value,
-      done: false
+      done: false,
+      deadline
     });
-    incrementNextId(); // nextId 하나 증가
 
+    setDeadline(null) // datepicker 초기화
     setValue(""); // input 초기화
-    setOpen(false); // open 닫기
   };
 
   return (
     <>
       <InsertFormPositioner>
         <InsertForm onSubmit={handleSubmit}>
-          <Input
+          <DatePicker
+          value={deadline}
+          bordered={false}
+          size="small"
+          placeholder='Set a deadline'
+          onChange={handleDeadlineChange}
+          disabledDate={handleDisabledDate}
+          showToday={false}
+          />
+          <TextInputBlock>
+            <Input
             autoFocus
             placeholder="What's need to be done?"
             onChange={handleChange}
             value={value}
-          />
+            />
 
-          <CircleButton onClick={handleToggle} open={open}>
-            <PlusCircleOutlined />
-          </CircleButton>
+            <CircleButton onClick={checkValidation}>
+              <PlusCircleOutlined />
+            </CircleButton>
+            {contextHolder}
+          </TextInputBlock>
         </InsertForm>
       </InsertFormPositioner>
     </>

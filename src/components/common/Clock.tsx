@@ -10,11 +10,9 @@ export default function Clock(): ReactElement {
       const interval = setInterval(() => {
           setNow(new Date());
           setTickTock(prev => !prev);
-      }, 1000);
-  
+      }, 500);
       return () => clearInterval(interval);
     }, []);
-
 
     const getTimeString = (time: number): string => time < 10 ? `0${time}` : `${time}`;
 
