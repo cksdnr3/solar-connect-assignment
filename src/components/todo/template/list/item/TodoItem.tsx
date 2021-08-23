@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { CheckOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Itodo } from "components/todo/TodoService";
 import styled, { css } from "styled-components";
@@ -17,11 +17,18 @@ const Icon = styled.div`
   }
 `;
 
-const TodoItemBlock = styled.div`
+const TodoItemBlock = styled.div<{ dragging: boolean }>`
   display: flex;
   align-items: center;
   padding-top: 12px;
   padding-bottom: 12px;
+
+  ${(props) => 
+    props.dragging &&
+      css`
+        opacity: .5;
+      `
+  }
 `;
 
 const CheckCircle = styled.div<{ done: boolean }>`
@@ -69,6 +76,16 @@ interface TodoItemProps {
 }
 
 const TodoItem = ({ toggleTodo, removeTodo, openEdit, todo }: TodoItemProps) => {
+  const [dragging, setDragging] = useState(false);
+
+  const handleDragStart = () => {
+    setDragging(true);
+  }
+
+  const handleDragEnd = () => {
+    setDragging(false);
+  }
+
   const handleToggle = () => {
     toggleTodo(todo.id);
   };
@@ -82,7 +99,13 @@ const TodoItem = ({ toggleTodo, removeTodo, openEdit, todo }: TodoItemProps) => 
   }
 
   return (
-    <TodoItemBlock>
+    <TodoItemBlock
+    draggable
+    className={`draggable ${dragging && 'dragging'}`}
+    dragging={dragging}
+    onDragStart={handleDragStart}
+    onDragEnd={handleDragEnd}
+    >
       <CheckCircle done={todo.done} onClick={handleToggle}>
         {todo.done && <CheckOutlined />}
       </CheckCircle>
