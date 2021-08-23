@@ -35,6 +35,7 @@ export const useTodo = () => {
     );
   };
 
+
   const removeTodo = (id: number) => {
     setTodoState((prevState) =>
       prevState.filter((todo: Itodo) => todo.id !== id)
@@ -68,11 +69,13 @@ export const useTodo = () => {
     localStorage.setItem("todos", JSON.stringify(todoState));
   };
 
+
   return {
     todoState,
     editTodo,
     toggleTodo,
     removeTodo,
-    createTodo
+    createTodo,
+    setTodoState
   };
 };

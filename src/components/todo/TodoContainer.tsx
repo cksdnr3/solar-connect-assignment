@@ -15,6 +15,7 @@ const TodoContainer = () => {
     removeTodo,
     createTodo,
     editTodo,
+    setTodoState,
   } = useTodo();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -40,6 +41,7 @@ const TodoContainer = () => {
             createTodo={createTodo}
             />
             <TodoList
+            setTodoState={setTodoState}
             openEdit={openEdit}
             toggleTodo={toggleTodo}
             removeTodo={removeTodo}

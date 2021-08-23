@@ -17,18 +17,11 @@ const Icon = styled.div`
   }
 `;
 
-const TodoItemBlock = styled.div<{ dragging: boolean }>`
+const TodoItemBlock = styled.div`
   display: flex;
   align-items: center;
   padding-top: 12px;
   padding-bottom: 12px;
-
-  ${(props) => 
-    props.dragging &&
-      css`
-        opacity: .5;
-      `
-  }
 `;
 
 const CheckCircle = styled.div<{ done: boolean }>`
@@ -76,15 +69,6 @@ interface TodoItemProps {
 }
 
 const TodoItem = ({ toggleTodo, removeTodo, openEdit, todo }: TodoItemProps) => {
-  const [dragging, setDragging] = useState(false);
-
-  const handleDragStart = () => {
-    setDragging(true);
-  }
-
-  const handleDragEnd = () => {
-    setDragging(false);
-  }
 
   const handleToggle = () => {
     toggleTodo(todo.id);
@@ -99,13 +83,7 @@ const TodoItem = ({ toggleTodo, removeTodo, openEdit, todo }: TodoItemProps) => 
   }
 
   return (
-    <TodoItemBlock
-    draggable
-    className={`draggable ${dragging && 'dragging'}`}
-    dragging={dragging}
-    onDragStart={handleDragStart}
-    onDragEnd={handleDragEnd}
-    >
+    <TodoItemBlock>
       <CheckCircle done={todo.done} onClick={handleToggle}>
         {todo.done && <CheckOutlined />}
       </CheckCircle>

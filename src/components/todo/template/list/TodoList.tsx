@@ -1,6 +1,6 @@
 import { Itodo } from "components/todo/TodoService";
 import moment from "moment";
-import React, { RefObject, useRef, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import TodoItem from "./item/TodoItem";
 
@@ -11,57 +11,50 @@ const TodoListBlock = styled.div`
   overflow-y: auto;
 `;
 
+const Draggable = styled.div``
+
+type DragHandler = React.DragEvent<HTMLDivElement>
+
 interface TodoListProps {
   todos: Itodo[];
   openEdit: (todo: Itodo) => void;
   toggleTodo: (id: number) => void;
   removeTodo: (id: number) => void;
+  setTodoState: (prev: Itodo[]) => void;
 }
 
-type AfterElement = {
-  offset: number;
-  element: Element | null;
-}
 
-const TodoList = ({ toggleTodo, removeTodo, openEdit, todos }: TodoListProps) => {
-  const container = useRef<HTMLDivElement>(null);
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const afterElement = getDragAfterElemnt(container, e.clientY);
-    const draggable = container.current?.querySelector('.dragging');
-
-    container.current?.insertBefore(draggable!, afterElement!);
+const TodoList = ({ toggleTodo, removeTodo, openEdit, setTodoState, todos }: TodoListProps) => {
+  const [dragged, setDragged] = useState<Itodo>(todos[0]);
+  const handleDragStart = (idx: number) => {
+    setDragged(todos[idx]);
   }
 
-  const getDragAfterElemnt = (container: RefObject<HTMLDivElement>, y: number) => {
-    const draggableElements = Array.from(container.current?.querySelectorAll('.draggable:not(.dragging)') || []);
-
-    return draggableElements.reduce((closest: AfterElement, child: Element) => {
-      const box = child.getBoundingClientRect();
-      const offset = y - box.top - box.height / 2
-      if (offset < 0 && offset > closest.offset) {
-        return { offset, element: child }
-      } else {
-        return closest
-      }
-    }, { offset: Number.NEGATIVE_INFINITY, element: null }).element
+  const handleDragOver = (e: DragHandler, idx: number) => {
+    const dragOver = todos[idx];
+    if (dragged === dragOver) return;
+    let items = todos.filter(item => item !== dragged);
+    items.splice(idx, 0, dragged);
+    setTodoState(items);
   }
 
   return (
-    <TodoListBlock
-      ref={container}
-      onDragOver={handleDragOver}
-    >
-      {todos && todos.map((todo) => (
-    <TodoItem
-    openEdit={openEdit}
-    toggleTodo={toggleTodo}
-    removeTodo={removeTodo}
-    key={todo.id}
-    todo={{ ...todo, deadline: todo.deadline && moment(todo.deadline) }}
-    />
-    ))}
+    <TodoListBlock>
+      {todos && todos.map((todo, idx) => (
+        <Draggable
+        key={todo.id}
+        draggable
+        onDragStart={() => handleDragStart(idx)}
+        onDragOver={(e) => handleDragOver(e, idx)}
+        >
+          <TodoItem
+          openEdit={openEdit}
+          toggleTodo={toggleTodo}
+          removeTodo={removeTodo}
+          todo={{ ...todo, deadline: todo.deadline && moment(todo.deadline) }}
+          />
+        </Draggable>
+      ))}
     </TodoListBlock>
   );
 };
